@@ -29,11 +29,11 @@ function App() {
 
   useEffect(function(){
     var todoApi = 'http://127.0.0.1:8000/api/todo';
-    
-      fetch(todoApi)
-        .then(function(response){
-          console.log(response)
-          return response.json();
+  
+      axios.get(todoApi)
+        .then(function(res){
+          const data = res.data;
+          return data;
         })
         .then(function(data){
           setDataRender(data);
