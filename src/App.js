@@ -27,7 +27,7 @@ function App() {
   const [isChecked, setIsChecked] = useState(false);
   const [isShowing, setIsShowing] = useState(true);
 
-  //get Json từ API
+  /*  get Json từ API  */
   useEffect(function(){
       var todoApi = 'http://127.0.0.1:8000/api/todo';
   
@@ -43,7 +43,7 @@ function App() {
 
   }, []) 
 
-//xử lý đẩy API
+/*  xử lý đẩy API */
   async function postData(url = '', data = {}) {
       axios.post(url, data, {
           headers: {
@@ -52,7 +52,7 @@ function App() {
       })
   };
 
-//xử lý cập nhập API
+/* xử lý cập nhập API */
   async function updateData(url = '', data = {}) {
       axios.patch(url, data, {
           headers: {
@@ -61,7 +61,7 @@ function App() {
       })
   };
 
-  //Tạo 1 data mới
+  /* Tạo 1 data mới */
   const handleCreateAPI = (id, status, title) => {
       let date = new Date();
   
@@ -77,7 +77,7 @@ function App() {
       rootData.push(newJob);
   }
 
- //Xử lý thêm data.
+ /* Xử lý thêm data. */
   const handleAdd = (e)=>{
 
       const isExist = rootData.filter(item=>{
@@ -95,7 +95,7 @@ function App() {
 
   }
 
- //Xử lý tìm kiếm data.
+ /* Xử lý tìm kiếm data. */
   const handleSearch = (e) =>{
       setSearchValue(e.target.value);
       setTabs(filters[0].name);
@@ -113,7 +113,7 @@ function App() {
       }
   }
  
-  //Xử lý lọc data khi change tabs.
+  /* Xử lý lọc data khi change tabs. */
   const filterTabs = (tabs)=>{
       if(tabs === "All"){
           setDataRender(rootData);
@@ -122,19 +122,19 @@ function App() {
             return item.STATUS === "false";
           })
           setDataRender(dataActives);      
-     }else{
+      }else{
           const dataCompleted = rootData.filter(item => {
             return item.STATUS === "true";
           })
           setDataRender(dataCompleted);
-    }
+      }
   }
   
   useEffect(()=> {  
       filterTabs(tabs)
   }, [tabs])
 
-  //khi tabs đang ở Active or completed: nếu checkbox thay đổi sẽ lọc lại data.
+  /* khi tabs đang ở Active or completed: nếu checkbox thay đổi sẽ lọc lại data. */
   const filterData = (tabs) => {
       switch(tabs){
           case 'Active':
@@ -156,7 +156,7 @@ function App() {
       filterData(tabs)
   }, [isChecked])
 
-  //xử lý cập nhập API
+  /* xử lý cập nhập API */
   const handleUpdateAPI = (id, title, status)=>{
       const date = new Date();
       const currentDate = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':'+ date.getMinutes() + ':' + date.getSeconds();
@@ -170,7 +170,7 @@ function App() {
       updateData(`http://127.0.0.1:8000/update/${id}`, updateJob, id)
   }
 
-  //Xử lý khi change checkbox thì cập nhập data.
+  /* Xử lý khi change checkbox thì cập nhập data. */
   const handleIsChecked = (e, job) =>{   
       e.target.checked ? job.STATUS = "true" : job.STATUS = "false"; 
 
@@ -184,43 +184,48 @@ function App() {
       setRootData(rootData)
   }
   
-  //Bật input add
+  /* Bật input add */
   const handleRenderAll = ()=>{
       setSearch(false);
       setAddValue("");
       setDataRender(rootData);
       setTabs(filters[0].name);
   }
-  //Bật input search 
- const handleOpenSearch  = () =>{
-      setSearch(true);
-      setSearchValue("");
-      setDataRender(rootData);
-      setTabs(filters[0].name);
- }
- const handleAddChange = (e) => {
-      setAddValue(e.target.value);
-      setDataRender(rootData);
-      setTabs(filters[0].name);
- }
 
- const handleChangeKey = () => {
-    document.onkeyup = function (event) {
-        switch(event.keyCode){
-          case 27:
-                  setIsShowing(false);
-              break;
-          case 191:
-              setSearch(true);
-              setIsShowing(true);
-              break;
-          default: 
-              setIsShowing(true);
-              break;
-        }      
-    };
- }
+  /* Bật input search */
+  const handleOpenSearch  = () =>{
+        setSearch(true);
+        setSearchValue("");
+        setDataRender(rootData);
+        setTabs(filters[0].name);
+  }
 
+  /* Xử lý thêm và thay đổi dữ liệu */
+  const handleAddChange = (e) => {
+        setAddValue(e.target.value);
+        setDataRender(rootData);
+        setTabs(filters[0].name);
+  }
+
+  /* Xử lý thay đổi key */
+  const handleChangeKey = () => {
+      document.onkeyup = function (event) {
+          switch(event.keyCode){
+            case 27:
+                    setIsShowing(false);
+                break;
+            case 191:
+                setSearch(true);
+                setIsShowing(true);
+                break;
+            default: 
+                setIsShowing(true);
+                break;
+          }      
+      };
+  }
+
+ /* Thay đổi key bàn phím */
   useEffect(()=>{
       handleChangeKey()
   })
@@ -228,7 +233,9 @@ function App() {
 
   return (
           <div className="App">
+
               <div className="Globo-app">
+
                   <header>
                       <h1 className="Globo-title">Things To Do</h1>
                       <div className="Globo-input" style={ isShowing ? {} : {display: "none"}}>
@@ -246,6 +253,7 @@ function App() {
                           />}
                       </div>
                   </header>
+
                   <div className="Globo-content">
                       <ul className="Globo-listJobs">
                           {dataRender.length > 0 ? dataRender.map((job, index)=>{               
@@ -264,6 +272,7 @@ function App() {
                           }) :  <p style={{margin: "10px 0", padding: "10px", background: "#F2F2F2", color: "#888888", fontWeight: "500"}}>There are not items</p>}
                       </ul>
                   </div>
+
                   <footer style={{display: "flex"}}>
                       <div className="Globo-handle" style={{display: "flex"}}>
                         <button id="Globo-button-add" onClick={handleRenderAll}>
@@ -289,7 +298,9 @@ function App() {
                           })}
                       </div>
                   </footer>
+                  
               </div>
+              
               <p className="message-notify">
                   {isShowing ? 'Press `Esc` to cancel.' : 'Press `/` to search and `N` to create a new item.'}
               </p>
