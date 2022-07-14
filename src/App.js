@@ -249,6 +249,7 @@ function App() {
 
 /* Xử lý thêm và thay đổi dữ liệu */
     const handleAddChange = (e) => {
+        setIsWarning(false);
         setAddValue(e.target.value);
         setDataRender(rootData);
         setTabs(filters[0].name);
