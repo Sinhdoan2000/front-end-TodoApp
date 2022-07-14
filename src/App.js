@@ -26,9 +26,10 @@ function App() {
     const [searchValue, setSearchValue] = useState("");
     const [isChecked, setIsChecked] = useState(false);
     const [isShowing, setIsShowing] = useState(true);
+    const [isWarning, setIsWarning] = useState(false);
   
 /*  get Json từ API  */
-    useEffect(function(){
+    const handleGetAPI = ()=>{
         var todoApi = 'http://127.0.0.1:8000/api/todo';
     
         axios.get(todoApi)
@@ -41,6 +42,9 @@ function App() {
                 setRootData(data);
             })
 
+    }
+    useEffect(function(){
+        handleGetAPI()
     }, []) 
 
 /*  xử lý gửi dữ liệu đến API */
@@ -61,7 +65,7 @@ function App() {
         })
     };
 
-/* Xử lý xoá item phía client */
+/* Xử lý xoá dữ liệu phía client */
     const handleDeleteFromClient= (id)=>{
         const currentRootItem = rootData.filter(function(item){
             return item.ID !== id;
@@ -74,7 +78,8 @@ function App() {
     }
 
 /* Xử lý xoá dữ liệu API */
-    async function handleDeleteAPI(id){   
+    async function handleDeleteAPI(id){ 
+        console.log(id);  
         var url = `http://127.0.0.1:8000/delete/${id}`;
         axios.delete(url)
         handleDeleteFromClient(id)
@@ -82,8 +87,7 @@ function App() {
 
 /* Tạo 1 data mới */
     const handleCreateAPI = (id, status, title) => {
-        let date = new Date();
-    
+        let date = new Date();          
             const newJob = {
                 ID: id,
                 STATUS: status,
@@ -91,25 +95,29 @@ function App() {
                 created_at: date.toString(),
                 updated_at: date.toString()       
             }
-    
+            
         postData('http://127.0.0.1:8000/api/todo', newJob)
         rootData.push(newJob);
+
     }
 
 /* Xử lý thêm data. */
-    const handleAdd = (e)=>{
+    const handleAdd = (e) => {
 
         const isExist = rootData.filter(item=>{
             return addValue.toLocaleLowerCase() === item.TITLE.toLocaleLowerCase();
         })
 
         if(isExist.length <= 0 && addValue && e.keyCode === 13){
-            let ID = rootData.length > 0 ? rootData[rootData.length - 1].ID + 1 : 0;
-            
-            handleCreateAPI(ID, 'false', addValue)        
+            setIsWarning(false);
+            let ID = rootData.length > 0 ? rootData[rootData.length - 1].ID + 1 : 1;
+            handleCreateAPI(ID, 'false', addValue) 
+                
             setRootData(rootData);
             setDataRender(rootData);
             setAddValue("");
+        }else if(isExist.length > 0 && e.keyCode === 13){
+            setIsWarning(true);
         }
 
     }
@@ -137,20 +145,24 @@ function App() {
   /* Xử lý lọc data khi change tabs. */
     const filterTabs = (tabs)=>{
 
-        if(tabs === "All"){
-            setDataRender(rootData);
-        }else if(tabs === "Active"){
-            const dataActives = rootData.filter(item => {
-                return item.STATUS === "false";
-            })
-
-            setDataRender(dataActives);      
-        }else{
-            const dataCompleted = rootData.filter(item => {
-                return item.STATUS === "true";
-            })
-
-            setDataRender(dataCompleted);
+        switch(tabs){
+            case 'All':
+                setDataRender(rootData);
+                break;
+            case 'Active':
+                const dataActives = rootData.filter(item => {
+                    return item.STATUS === "false";
+                })
+    
+                setDataRender(dataActives);   
+                break;
+            default:
+                const dataCompleted = rootData.filter(item => {
+                    return item.STATUS === "true";
+                })
+    
+                setDataRender(dataCompleted);
+                break;          
         }
 
     }
@@ -167,7 +179,7 @@ function App() {
                     const dataActives = rootData.filter(item => {
                         return item.STATUS === "false";
                     })
-
+                    setIsWarning(false);
                     setDataRender(dataActives);
                 break;
 
@@ -175,7 +187,7 @@ function App() {
                     const dataCompleted = rootData.filter(item => {
                         return item.STATUS === "true";
                     })
-
+                    setIsWarning(false);
                     setDataRender(dataCompleted);
                 break;
         }
@@ -228,6 +240,7 @@ function App() {
 
 /* Bật input search */
     const handleOpenSearch  = () =>{
+        setIsWarning(false);
         setSearch(true);
         setSearchValue("");
         setDataRender(rootData);
@@ -269,72 +282,66 @@ function App() {
 
 
   return (
-          <div className="App">
+            <div className="App">
 
-              <div className="Globo-app">
+                <div className="Globo-app">
 
-                  <header>
-                      <h1 className="Globo-title">Things To Do</h1>
-                      <div className="Globo-input" style={ isShowing ? {} : {display: "none"}}>
-                          {!isSearch && <input type="text" 
-                              id="Globo-input_add"
-                              placeholder='Add New' 
-                              value={addValue} 
-                              onChange={e => handleAddChange(e)}
-                              onKeyUp={e => handleAdd(e)}
-                          />}
-                          {isSearch && <input type="text" 
-                              id="Globo-input_search" 
-                              placeholder='Search' 
-                              onChange={e => handleSearch(e)}
-                          />}
-                      </div>
-                  </header>
+                    <header>
+                        <h1 className="Globo-title">Things To Do</h1>
+                        <div className="Globo-input" style={ isShowing ? {} : {display: "none"}}>
+                            {!isSearch && <input type="text" 
+                                id="Globo-input_add"
+                                placeholder='Add New' 
+                                value={addValue} 
+                                onChange={e => handleAddChange(e)}
+                                onKeyUp={e => handleAdd(e)}
+                            />}
+                            {!isSearch && isWarning && <p style={{ margin: '5px 10px', color: 'red'}}>This job was  exists!</p>}
+                            {isSearch && <input type="text" 
+                                id="Globo-input_search" 
+                                placeholder='Search' 
+                                onChange={e => handleSearch(e)}
+                            />}
+                        </div>
+                    </header>
 
-                  <div className="Globo-content">
-                      <ul className="Globo-listJobs">
-                          {dataRender.length > 0 ? dataRender.map((job, index)=>{               
-                              return (
-                                  <li key={index} id={"Globo-job-" + job.ID} className="Globo-job_item" style={{display: "flex"}}>
-                                      <input type="checkbox" 
-                                        id={"Globo-checkbox-" + job.ID}
-                                        className="Globo-checkboxJob" 
-                                        checked={job.STATUS === "true" ? true : false}
-                                        onChange={e => handleIsChecked(e, job)}
-                                        onClick={() => setIsChecked(!isChecked)}
-                                      />
-                                      <label htmlFor={"Globo-checkbox-" + job.ID} className="Globo-job_name">{job.TITLE}</label>
-                                      <button 
-                                            type="button" 
-                                            style={{ 
-                                                marginLeft: 'auto', 
-                                                border: 'none', 
-                                                outline: 'none', 
-                                                background: '#fff', 
-                                                boxShadow: '0 0 10px rgba(0,0,0,0.5)', 
-                                                borderRadius: '5px' 
-                                            }}
+                    <div className="Globo-content">
+                        <ul className="Globo-listJobs">
+                            {dataRender.length > 0 ? dataRender.map((job, index)=>{               
+                                return (
+                                    <li key={index} className="Globo-job_item" style={{display: "flex"}}>
+                                        <input type="checkbox" 
+                                            id={"Globo-checkbox-" + job.ID}
+                                            className="Globo-checkboxJob" 
+                                            checked={job.STATUS === "true" ? true : false}
+                                            onChange={e => handleIsChecked(e, job)}
+                                            onClick={() => setIsChecked(!isChecked)}
+                                        />
+                                        <label htmlFor={"Globo-checkbox-" + job.ID} className="Globo-job_name">{job.TITLE}</label>
+                                        <button 
+                                            type="button"
+                                            className="Globo-deleteBtn" 
                                             onClick={() => handleDeleteAPI(job.ID)}
                                         >x</button>
-                                  </li>
-                              )
-                          }) :  <p style={{margin: "10px 0", padding: "10px", background: "#F2F2F2", color: "#888888", fontWeight: "500"}}>There are not items</p>}
-                      </ul>
-                  </div>
+                                    </li>
+                                )
+                            }) :  <p className="Globo-message-null">There are not items</p>}
+                        </ul>
+                    </div>
 
-                  <footer style={{display: "flex"}}>
-                      <div className="Globo-handle" style={{display: "flex"}}>
-                          <button id="Globo-button-add" onClick={handleRenderAll}>
-                              <i className="fa-solid fa-plus"></i>
-                          </button>
-                          <button id="Globo-button-search" style={{color: "#777"}} onClick={()=> handleOpenSearch()}>
-                              <i className="fa-solid fa-magnifying-glass"></i>
-                          </button>
-                          <span className="Globo-countJob">{dataRender.length > 1 ? dataRender.length + " items left" : dataRender.length + " item left"}</span>
-                      </div>
-                      <div className='Globo-filters' style={{display: "flex"}}>
-                          {filters.map((filter, index)=>{
-                              return (
+                    <footer style={{display: "flex"}}>
+                        <div className="Globo-handle" style={{display: "flex"}}>
+                            <button id="Globo-button-add" onClick={handleRenderAll}>
+                                <i className="fa-solid fa-plus"></i>
+                            </button>
+                            <button id="Globo-button-search" style={{color: "#777"}} onClick={()=> handleOpenSearch()}>
+                                <i className="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                            <span className="Globo-countJob">{dataRender.length > 1 ? dataRender.length + " items left" : dataRender.length + " item left"}</span>
+                        </div>
+                        <div className='Globo-filters' style={{display: "flex"}}>
+                            {filters.map((filter, index)=>{
+                                return (
                                     <button 
                                         key={index}
                                         className={tabs === filter.name ? 'Globo-filters_button selected-'+ filter.name : 'Globo-filters_button' + filter.name}
@@ -343,18 +350,18 @@ function App() {
                                     >
                                         {filter.name}
                                     </button>
-                              )
-                          })}
-                      </div>
-                  </footer>
+                                )
+                            })}
+                        </div>
+                    </footer>
 
-              </div>
-              
-              <p className="message-notify">
-                  {isShowing ? 'Press `Esc` to cancel.' : 'Press `/` to search and `N` to create a new item.'}
-              </p>
+                </div>
+                
+                <p className="message-notify">
+                    {isShowing ? 'Press `Esc` to cancel.' : 'Press `/` to search and `N` to create a new item.'}
+                </p>
 
-          </div>
+            </div>
   );
 }
 
