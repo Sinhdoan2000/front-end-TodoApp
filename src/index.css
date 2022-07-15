@@ -70,6 +70,7 @@ li.Globo-job_item{
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
   cursor: pointer;
+  align-items: center;
 }
 input[type="checkbox"]{
   cursor: pointer;
@@ -188,7 +189,8 @@ footer button{
   color: #999;
   font-weight: 500;
 }
-.Globo-deleteBtn{ 
+.Globo-deleteBtn,
+.Globo-updateBtn{ 
   margin-left: auto;
   border: none;
   outline: none; 

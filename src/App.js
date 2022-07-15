@@ -1,5 +1,5 @@
 import './index.css';
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import '@shopify/polaris/build/esm/styles.css';
 import axios from 'axios';
 
@@ -27,7 +27,10 @@ function App() {
     const [isChecked, setIsChecked] = useState(false);
     const [isShowing, setIsShowing] = useState(true);
     const [isWarning, setIsWarning] = useState(false);
-  
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [valueUpdate, setValueUpdate] = useState("");
+    const [dataUpdate, setDataUpdate] = useState({});
+
 /*  get Json từ API  */
     const handleGetAPI = ()=>{
         var todoApi = 'http://127.0.0.1:8000/api/todo';
@@ -120,6 +123,44 @@ function App() {
         }
 
     }
+    const reRenderData = (id, currentDate) =>{
+        rootData.forEach(function (item){
+            if(item.ID == id){
+                item.TITLE = valueUpdate;
+                item.updated_at = currentDate;
+            }
+        })
+
+        dataRender.forEach(function (item){
+            if(item.ID == id){
+                item.TITLE = valueUpdate;
+                item.updated_at = currentDate;
+            }
+        })
+        setRootData(rootData);
+        setDataRender(dataRender);
+        setIsUpdate(false);
+    }
+/* Xử lý update data. */
+    const handleUpdateData = e =>{
+        if(valueUpdate != "" && e.keyCode === 13){
+            let date = new Date();
+            const currentDate = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':'+ date.getMinutes() + ':' + date.getSeconds();
+            const data = {
+                TITLE: valueUpdate,
+                updated_at: currentDate  
+            }
+            updateData(`http://127.0.0.1:8000/update/${dataUpdate.ID}`, data)
+            reRenderData(dataUpdate.ID, currentDate)
+
+        }
+    }
+
+    const handleGetDataUpdate = data =>{
+        setIsUpdate(true);
+        setValueUpdate(data.TITLE)
+        setDataUpdate(data)
+    }
 
 /* Xử lý tìm kiếm data. */
     const handleSearch = (e) =>{
@@ -209,7 +250,7 @@ function App() {
             updated_at: currentDate   
         }
         
-        updateData(`http://127.0.0.1:8000/update/${id}`, updateJob, id)
+        updateData(`http://127.0.0.1:8000/update/${id}`, updateJob)
 
     }
 
@@ -233,6 +274,7 @@ function App() {
     const handleRenderAll = ()=>{
         setSearch(false);
         setAddValue("");
+        setIsUpdate(false);
         setDataRender(rootData);
         setTabs(filters[0].name);
     }
@@ -240,6 +282,7 @@ function App() {
 /* Bật input search */
     const handleOpenSearch  = () =>{
         setIsWarning(false);
+        setIsUpdate(false);
         setSearch(true);
         setSearchValue("");
         setDataRender(rootData);
@@ -279,7 +322,7 @@ function App() {
         handleChangeKey()
     })
 
-
+  
   return (
             <div className="App">
 
@@ -288,15 +331,23 @@ function App() {
                     <header>
                         <h1 className="Globo-title">Things To Do</h1>
                         <div className="Globo-input" style={ isShowing ? {} : {display: "none"}}>
-                            {!isSearch && <input type="text" 
+                            {!isSearch && !isUpdate && <input type="text" 
                                 id="Globo-input_add"
                                 placeholder='Add New' 
                                 value={addValue} 
                                 onChange={e => handleAddChange(e)}
                                 onKeyUp={e => handleAdd(e)}
                             />}
-                            {!isSearch && isWarning && <p style={{ margin: '5px 10px', color: 'red'}}>This job was  exists!</p>}
-                            {isSearch && <input type="text" 
+                            
+                            {isUpdate && <input type="text" 
+                                id="Globo-input_add"
+                                placeholder='Update job' 
+                                value={valueUpdate} 
+                                onChange={e => setValueUpdate(e.target.value)}
+                                onKeyUp={e => handleUpdateData(e)}
+                            />}
+                            {!isSearch && !isUpdate && isWarning && <p style={{ margin: '5px 10px', color: 'red'}}>This job was  exists!</p>}
+                            {isSearch && !isUpdate && <input type="text" 
                                 id="Globo-input_search" 
                                 placeholder='Search' 
                                 onChange={e => handleSearch(e)}
@@ -306,7 +357,7 @@ function App() {
 
                     <div className="Globo-content">
                         <ul className="Globo-listJobs">
-                            {dataRender.length > 0 ? dataRender.map((job, index)=>{               
+                            {dataRender.length > 0 ? dataRender.map((job, index)=>{           
                                 return (
                                     <li key={index} className="Globo-job_item" style={{display: "flex"}}>
                                         <input type="checkbox" 
@@ -317,11 +368,18 @@ function App() {
                                             onClick={() => setIsChecked(!isChecked)}
                                         />
                                         <label htmlFor={"Globo-checkbox-" + job.ID} className="Globo-job_name">{job.TITLE}</label>
-                                        <button 
-                                            type="button"
-                                            className="Globo-deleteBtn" 
-                                            onClick={() => handleDeleteAPI(job.ID)}
-                                        >x</button>
+                                        <div style={{marginLeft: 'auto'}}>
+                                            <button 
+                                                type="button"
+                                                className="Globo-updateBtn" 
+                                                onClick = {() => handleGetDataUpdate(job)}
+                                            >Edit</button>
+                                            <button 
+                                                type="button"
+                                                className="Globo-deleteBtn" 
+                                                onClick={() => handleDeleteAPI(job.ID)}
+                                            >x</button>
+                                        </div>                                   
                                     </li>
                                 )
                             }) :  <p className="Globo-message-null">There are not items</p>}
