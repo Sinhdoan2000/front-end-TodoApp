@@ -77,12 +77,72 @@ input[type="checkbox"]{
 .Globo-job_name{
   padding-left: 5px;
   cursor: pointer;
+  line-height: 25px;
 }
 .Globo-checkboxJob:checked + .Globo-job_name{
   text-decoration: line-through;
   color: #AAAAAA;
   font-weight: 500;
 }
+.Globo-checkboxJob {
+  -webkit-appearance: none;
+  outline: none;
+  position: relative;
+  height: 20px;
+  width: 45px;
+  border: 5px solid var(--body);
+  border-radius: 2.5rem;
+  cursor: pointer;
+  box-shadow: 9px 9px 16px rgba(189, 189, 189, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5), inset 10px 10px 15px -10px #c3c3c3, inset -10px -10px 15px -10px #fff;
+}
+@media (prefers-color-scheme: light) {
+  .Globo-checkboxJob {
+    box-shadow: 9px 9px 16px rgba(189, 189, 189, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5), inset 10px 10px 15px -10px #c3c3c3, inset -10px -10px 15px -10px #fff;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .Globo-checkboxJob {
+    box-shadow: -8px -4px 8px 0px rgba(255, 255, 255, 0.05), 8px 4px 12px 0px rgba(0, 0, 0, 0.5), inset -4px -4px 4px 0px rgba(255, 255, 255, 0.05), inset 4px 4px 4px 0px rgba(0, 0, 0, 0.5);
+  }
+}
+.Globo-checkboxJob::before {
+  content: "";
+  height: 12px;
+  width: 12px;
+  background-color: #fff;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 5px;
+  bottom: 0;
+  border-radius: 50%;
+  box-shadow: 7px 7px 15px #c3c3c3, 9px 9px 16px rgba(189, 189, 189, 0.6);
+  transition: 0.15s;
+}
+@media (prefers-color-scheme: light) {
+  .Globo-checkboxJob::before {
+    box-shadow: 7px 7px 15px #c3c3c3, 9px 9px 16px rgba(189, 189, 189, 0.6);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .Globo-checkboxJob::before {
+    box-shadow: -8px -4px 8px 0px rgba(255, 255, 255, 0.05), 8px 4px 12px 0px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.Globo-checkboxJob:checked {
+  background: #4ae708;
+}
+@media (prefers-color-scheme: light) {
+  .Globo-checkboxJob:checked {
+    box-shadow: 9px 9px 16px rgba(189, 189, 189, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5), inset 10px 10px 15px -10px #0047b9, inset -10px -10px 15px -10px #0047b9;
+  }
+}
+.Globo-checkboxJob:checked::before {
+  left: 29px;
+  box-shadow: none;
+}
+
 .Globo-job_name:first-letter{
   text-transform: capitalize
 }

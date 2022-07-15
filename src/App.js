@@ -20,10 +20,10 @@ function App() {
   
     const [dataRender, setDataRender] = useState([]);
     const [rootData, setRootData] = useState([]);
-    const [tabs, setTabs] = useState('All');
-    const [isSearch, setSearch] = useState(false);
+    const [tabs, setTabs] = useState('All');    
     const [addValue, setAddValue] = useState("");
     const [searchValue, setSearchValue] = useState("");
+    const [isSearch, setSearch] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [isShowing, setIsShowing] = useState(true);
     const [isWarning, setIsWarning] = useState(false);
@@ -79,7 +79,6 @@ function App() {
 
 /* Xử lý xoá dữ liệu API */
     async function handleDeleteAPI(id){ 
-        console.log(id);  
         var url = `http://127.0.0.1:8000/delete/${id}`;
         axios.delete(url)
         handleDeleteFromClient(id)
@@ -259,7 +258,6 @@ function App() {
     const handleChangeKey = () => {
 
         document.onkeyup = function (event) {
-
             switch(event.keyCode){
                 case 27:
                         setIsShowing(false);
