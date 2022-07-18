@@ -1,5 +1,5 @@
 import './index.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import '@shopify/polaris/build/esm/styles.css';
 import axios from 'axios';
 
@@ -141,6 +141,7 @@ function App() {
         setDataRender(dataRender);
         setIsUpdate(false);
     }
+
 /* Xử lý update data. */
     const handleUpdateData = e =>{
         if(valueUpdate != "" && e.keyCode === 13){
@@ -152,7 +153,6 @@ function App() {
             }
             updateData(`http://127.0.0.1:8000/update/${dataUpdate.ID}`, data)
             reRenderData(dataUpdate.ID, currentDate)
-
         }
     }
 
@@ -331,6 +331,7 @@ function App() {
                     <header>
                         <h1 className="Globo-title">Things To Do</h1>
                         <div className="Globo-input" style={ isShowing ? {} : {display: "none"}}>
+                            
                             {!isSearch && !isUpdate && <input type="text" 
                                 id="Globo-input_add"
                                 placeholder='Add New' 
@@ -346,12 +347,14 @@ function App() {
                                 onChange={e => setValueUpdate(e.target.value)}
                                 onKeyUp={e => handleUpdateData(e)}
                             />}
+
                             {!isSearch && !isUpdate && isWarning && <p style={{ margin: '5px 10px', color: 'red'}}>This job was  exists!</p>}
                             {isSearch && !isUpdate && <input type="text" 
                                 id="Globo-input_search" 
                                 placeholder='Search' 
                                 onChange={e => handleSearch(e)}
                             />}
+
                         </div>
                     </header>
 
